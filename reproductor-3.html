@@ -37,22 +37,22 @@
         hls.on(Hls.Events.MANIFEST_PARSED, function () {
           video.play().catch(error => console.log("Autoplay bloqueado:", error));
 
-          // Después de 1/2 segundo, activar sonido y subir volumen
+          // Después de 1 segundo, activar sonido y subir volumen
           setTimeout(() => {
             video.muted = false;
             video.volume = 1.0;
-          }, 500);
+          }, 1000);
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = videoSrc;
         video.addEventListener('loadedmetadata', function () {
           video.play().catch(error => console.log("Autoplay bloqueado:", error));
 
-          // Después de 1/2 segundo, activar sonido y subir volumen
+          // Después de 1 segundo, activar sonido y subir volumen
           setTimeout(() => {
             video.muted = false;
             video.volume = 1.0;
-          }, 500);
+          }, 1000);
         });
       }
     } else {
@@ -61,4 +61,5 @@
   </script>
 </body>
 </html>
+
 
