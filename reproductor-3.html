@@ -1,65 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reproductor HLS</title>
-  <style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor HLS</title>
+<style>
     body {
       background-color: #000000; /* Fondo negro */
-      color: white; /* Texto en blanco */
-    }
-    video {
-      width: 100%;
-      height: 100%;
+      color: white; /* Texto en blanco para mejor visibilidad */
     }
   </style>
 </head>
 <body>
-  <video id="video" controls autoplay muted></video>
+    <video id="video" controls autoplay muted width="100%" height="100%"></video>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.3.4/hls.min.js"></script>
-  <script>
-    // Obtener parámetros de la URL
-    function getQueryParam(name) {
-      const urlParams = new URLSearchParams(window.location.search);
-      return urlParams.get(name);
-    }
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.3.4/hls.min.js"></script>
+    <script>
+        // Funci�n para obtener par�metros de la URL
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
 
-    var video = document.getElementById('video');
-    var videoSrc = getQueryParam("var1");  // URL del video desde var1
+        var video = document.getElementById('video');
+        var videoSrc = getQueryParam("var1");  // Obtener URL del video desde var1
 
-    if (videoSrc) {
-      if (Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(videoSrc);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-          video.play().catch(error => console.log("Autoplay bloqueado:", error));
-
-          // Después de 1 segundo, activar sonido y subir volumen
-          setTimeout(() => {
-            video.muted = false;
-            video.volume = 1.0;
-          }, 1000);
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = videoSrc;
-        video.addEventListener('loadedmetadata', function () {
-          video.play().catch(error => console.log("Autoplay bloqueado:", error));
-
-          // Después de 1 segundo, activar sonido y subir volumen
-          setTimeout(() => {
-            video.muted = false;
-            video.volume = 1.0;
-          }, 1000);
-        });
-      }
-    } else {
-      console.log("No se encontró una URL válida en var1");
-    }
-  </script>
+        if (videoSrc) {
+            if (Hls.isSupported()) {
+                var hls = new Hls();
+                hls.loadSource(videoSrc);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    video.muted = true;  // Forzar muteo para autoplay
+                    video.play().catch(error => console.log("Autoplay bloqueado:", error));
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSrc;
+                video.muted = true;  // Forzar muteo para autoplay
+                video.addEventListener('loadedmetadata', function () {
+                    video.play().catch(error => console.log("Autoplay bloqueado:", error));
+                });
+            }
+        } else {
+            console.log("No se encontr� una URL v�lida en var1");
+        }
+    </script>
 </body>
 </html>
-
 
