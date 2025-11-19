@@ -1,0 +1,111 @@
+<html>
+<head>
+    <script src="//cdn.jsdelivr.net/npm/@clappr/player@0.8/dist/clappr.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/@swarmcloud/hls/p2p-engine.min.js"></script>
+    <style>
+    body, html {margin: 0;padding: 0;width: 100%;height: 100%;overflow: hidden;}
+    #player {position: absolute;top: 0;left: 0;width: 100%;height: 100%;}
+    /* CSS de la12hd.com/cssm.css incluido directamente */
+    .media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-background[data-seekbar] {
+        height: 5px !important;
+    }
+    .media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-background[data-seekbar] {
+        height: 7px !important;
+    }
+    </style>
+</head>
+<body>
+
+
+  <div id="player">
+    <div data-player="" tabindex="9999" class="" style="height: 0%; width: 0%;">
+      <div class="container" data-container="">
+        <div class="player-poster clickable" data-poster="">
+          <div class="play-wrapper" data-poster="">
+            
+          </div>
+
+  </div><div data-spinner="" class="spinner-three-bounce" style="display: none;"><div data-bounce1=""></div><div data-bounce2=""></div><div data-bounce3=""></div>
+<style class="clappr-style">.spinner-three-bounce[data-spinner] {
+  position: absolute;
+  margin: 0 auto;
+  width: 70px;
+  text-align: center;
+  z-index: 999;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  /* center vertically */
+  top: 50%;
+  transform: translateY(-50%); }
+  .spinner-three-bounce[data-spinner] > div {
+    width: 18px;
+    height: 18px;
+    background-color: #FFFFFF;
+    border-radius: 100%;
+    display: inline-block;
+    animation: bouncedelay 1.4s infinite ease-in-out;
+    /* Prevent first frame from flickering when animation starts */
+    animation-fill-mode: both; }
+  .spinner-three-bounce[data-spinner] [data-bounce1] {
+    animation-delay: -0.32s; }
+  .spinner-three-bounce[data-spinner] [data-bounce2] {
+    animation-delay: -0.16s; }
+
+@keyframes bouncedelay {
+  0%, 80%, 100% {
+    transform: scale(0); }
+  40% {
+    transform: scale(1); } }
+</style></div><style class="clappr-style">.container[data-container] {
+  position: absolute;
+  background-color: black;
+  height: 100%;
+  width: 100%;
+  max-width: 100%; }
+  .container[data-container] .chromeless {
+    cursor: default; }
+
+[data-player]:not(.nocursor) .container[data-container]:not(.chromeless).pointer-enabled {
+  cursor: pointer; }
+</style>
+  <video data-html5-video="" preload="metadata" src="blob:https://la14hd.com/4533382c-d1c5-44e2-8c34-f7d2ffe175f8">
+</video>
+  </div>
+  
+</div>
+  
+</div>
+<script>
+    var playbackURL = "https://agvyby.fubohd.com:443/espn2/mono.m3u8?token=77065d66b9e453091ee3eed95a47b465ca22f737-29-1763595385-1763577385";
+    var p2pConfig = {
+        live: true,
+        trackerZone: "us",    
+    }
+    P2PEngineHls.tryRegisterServiceWorker(p2pConfig).then(() => {
+        var player = new Clappr.Player({
+            source: playbackURL,
+            parentId: "#player",
+            poster: "",
+            width: "100%",
+            height: "100%",
+            autoPlay: true,
+            plugins: [],
+            mediacontrol: {seekbar: "#D4ED31", buttons: "#FFFFFF"},
+        });
+        p2pConfig.hlsjsInstance = player.core.getCurrentPlayback()?._hls;
+        var engine = new P2PEngineHls(p2pConfig);
+    });
+</script>
+
+
+<script type="text/javascript">
+    aclib.runPop({
+        zoneId: '9169782',
+    });
+
+
+</body>
+</html>
+
