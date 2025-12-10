@@ -3,79 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DG-Player | Reproductor M3U</title>
+  <title>DG-Player | Reproduciendo canal...</title>
   <style>
     body {
       background-color: black;
       color: white;
       text-align: center;
-      padding-top: 60px;
+      padding-top: 80px;
       font-family: Arial, sans-serif;
     }
     .loading {
       font-size: 20px;
       color: #00ffcc;
     }
-    video {
-      width: 90%;
-      max-width: 800px;
-      border: 2px solid #00ffcc;
-      background: black;
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
-  <h2 id="status">?? Cargando canal...</h2>
-  <p class="loading">Por favor espera unos segundos...</p>
+  <h2 id="titulo">🎬 Cargando canal...</h2>
+  <p class="loading" id="mensaje">Por favor espera unos segundos...</p>
 
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      // Obtener el parámetro ?star= del URL
       const params = new URLSearchParams(window.location.search);
       const canal = params.get("star") || "";
-      const m3uUrl = "https://gracom07011964.github.io/web/basura/regionales.m3u";
-
       if (!canal) {
-        document.body.innerHTML = "<h2>?? Debes indicar un canal con ?star=NombreDelCanal</h2>";
+        document.body.innerHTML = "<h2>⚠️ Debes indicar un canal con ?star=NombreDelCanal</h2>";
         return;
       }
 
-      document.getElementById("status").textContent = `?? Buscando canal "${canal}"...`;
+      document.getElementById("titulo").textContent = `🎥 Buscando canal "${canal}"...`;
+
+      // Usa proxy para evitar bloqueo CORS
+      const proxy = "https://cors-proxy.fr/";
+      const m3uUrl = proxy + "https://live.saohgdasregions.fun/regionales.m3u";
 
       try {
         const response = await fetch(m3uUrl);
         if (!response.ok) throw new Error("No se pudo cargar el archivo M3U.");
-
         const text = await response.text();
 
-        // Buscar el bloque correspondiente al canal indicado
+        // Buscar la URL del canal
         const regex = new RegExp(`#EXTINF:[^\\n]*${canal}[^\\n]*\\n([^\\n]+)`, "i");
         const match = text.match(regex);
 
         if (match && match[1]) {
           const streamUrl = match[1].trim();
 
-          // Reemplazar el contenido del body con el reproductor
-          document.body.innerHTML = `
-            <h2>?? Reproduciendo "${canal}"</h2>
-
-   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      window.location.href = "${streamUrl}";
-    });
-  </script>
-
-            <video controls autoplay>
-              <source src="${streamUrl}" type="video/mp2t">
-              Tu navegador no soporta la reproducción de video .ts
-            </video>
-          `;
+          // Mostrar mensaje antes de redirigir
+          document.getElementById("mensaje").textContent = "🔁 Redirigiendo al stream...";
+          setTimeout(() => {
+            window.location.href = streamUrl; // redirige como tu script original
+          }, 1000);
         } else {
-          document.body.innerHTML = `<h2>? No se encontró el canal "${canal}" en la lista.</h2>`;
+          document.body.innerHTML = `<h2>❌ No se encontró el canal "${canal}" en la lista.</h2>`;
         }
       } catch (error) {
-        document.body.innerHTML = `<h2>?? Error al cargar el canal.</h2><p>${error.message}</p>`;
+        document.body.innerHTML = `<h2>🚫 Error al cargar el canal.</h2><p>${error.message}</p>`;
       }
     });
   </script>
