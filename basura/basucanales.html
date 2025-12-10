@@ -59,6 +59,13 @@
           // Reemplazar el contenido del body con el reproductor
           document.body.innerHTML = `
             <h2>?? Reproduciendo "${canal}"</h2>
+
+   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      window.location.href = "${streamUrl}";
+    });
+  </script>
+
             <video controls autoplay>
               <source src="${streamUrl}" type="video/mp2t">
               Tu navegador no soporta la reproducción de video .ts
