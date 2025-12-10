@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DG-Player | Reproductor M3U</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding-top: 60px;
+      font-family: Arial, sans-serif;
+    }
+    .loading {
+      font-size: 20px;
+      color: #00ffcc;
+    }
+    video {
+      width: 90%;
+      max-width: 800px;
+      border: 2px solid #00ffcc;
+      background: black;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2 id="status">?? Cargando canal...</h2>
+  <p class="loading">Por favor espera unos segundos...</p>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Obtener el parámetro ?star= del URL
+      const params = new URLSearchParams(window.location.search);
+      const canal = params.get("star") || "";
+      const m3uUrl = "https://live.saohgdasregions.fun/regionales.m3u";
+
+      if (!canal) {
+        document.body.innerHTML = "<h2>?? Debes indicar un canal con ?star=NombreDelCanal</h2>";
+        return;
+      }
+
+      document.getElementById("status").textContent = `?? Buscando canal "${canal}"...`;
+
+      try {
+        const response = await fetch(m3uUrl);
+        if (!response.ok) throw new Error("No se pudo cargar el archivo M3U.");
+
+        const text = await response.text();
+
+        // Buscar el bloque correspondiente al canal indicado
+        const regex = new RegExp(`#EXTINF:[^\\n]*${canal}[^\\n]*\\n([^\\n]+)`, "i");
+        const match = text.match(regex);
+
+        if (match && match[1]) {
+          const streamUrl = match[1].trim();
+
+          // Reemplazar el contenido del body con el reproductor
+          document.body.innerHTML = `
+            <h2>?? Reproduciendo "${canal}"</h2>
+            <video controls autoplay>
+              <source src="${streamUrl}" type="video/mp2t">
+              Tu navegador no soporta la reproducción de video .ts
+            </video>
+          `;
+        } else {
+          document.body.innerHTML = `<h2>? No se encontró el canal "${canal}" en la lista.</h2>`;
+        }
+      } catch (error) {
+        document.body.innerHTML = `<h2>?? Error al cargar el canal.</h2><p>${error.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
