@@ -31,10 +31,10 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-      // Obtener el par·metro ?star= del URL
+      // Obtener el par√°metro ?star= del URL
       const params = new URLSearchParams(window.location.search);
       const canal = params.get("star") || "";
-      const m3uUrl = "https://live.saohgdasregions.fun/regionales.m3u";
+      const m3uUrl = "https://gracom07011964.github.io/web/basura/regionales.m3u";
 
       if (!canal) {
         document.body.innerHTML = "<h2>?? Debes indicar un canal con ?star=NombreDelCanal</h2>";
@@ -61,11 +61,11 @@
             <h2>?? Reproduciendo "${canal}"</h2>
             <video controls autoplay>
               <source src="${streamUrl}" type="video/mp2t">
-              Tu navegador no soporta la reproducciÛn de video .ts
+              Tu navegador no soporta la reproducci√≥n de video .ts
             </video>
           `;
         } else {
-          document.body.innerHTML = `<h2>? No se encontrÛ el canal "${canal}" en la lista.</h2>`;
+          document.body.innerHTML = `<h2>? No se encontr√≥ el canal "${canal}" en la lista.</h2>`;
         }
       } catch (error) {
         document.body.innerHTML = `<h2>?? Error al cargar el canal.</h2><p>${error.message}</p>`;
