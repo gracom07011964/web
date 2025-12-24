@@ -61,7 +61,7 @@
 </head>
 
 <body>
-  <div id="loader"> Espere un momento…. </div>
+  <div id="loader"> Espere un momentoâ€¦. </div>
 
   <iframe 
     id="visor"
@@ -73,7 +73,7 @@
   <footer>  </footer>
 
   <script>
-    // ?? Obtener parámetros de la URL
+    // ?? Obtener parÃ¡metros de la URL
     function getParameter(name) {
       const params = new URLSearchParams(window.location.search);
       return params.get(name);
@@ -87,7 +87,7 @@
       };
 
       const bloquearRedirecciones = function() {
-        console.warn("?? Redirección bloqueada.");
+        console.warn("?? RedirecciÃ³n bloqueada.");
       };
       window.location.assign = bloquearRedirecciones;
       window.location.replace = bloquearRedirecciones;
@@ -108,12 +108,12 @@
           value: window.top.location
         });
       } catch (e) {
-        console.warn("?? Protección top.location aplicada.");
+        console.warn("?? ProtecciÃ³n top.location aplicada.");
       }
     })();
 
-    // ?? Carga automática del enlace pasado en ?star=
-    const urlParam = getParameter('star');
+    // ?? Carga automÃ¡tica del enlace pasado en ?gets=
+    const urlParam = getParameter('gets');
     const visor = document.getElementById('visor');
     const loader = document.getElementById('loader');
 
@@ -122,16 +122,16 @@
       visor.src = urlParam;
       console.log("?? Reproduciendo:", urlParam);
 
-      // Oculta el mensaje cuando carga la página
+      // Oculta el mensaje cuando carga la pÃ¡gina
       visor.addEventListener('load', () => {
         setTimeout(() => {
           loader.classList.add('hidden');
-        }, 500); // ligera demora para suavizar transición
+        }, 500); // ligera demora para suavizar transiciÃ³n
       });
     } else {
-      loader.textContent = "?? No se detectó una URL válida. Use ?star=https://...";
+      loader.textContent = "?? No se detectÃ³ una URL vÃ¡lida. Use ?gets=https://...";
       setTimeout(() => loader.classList.add('hidden'), 4000);
-      console.log("?? No se detectó una URL válida. Esperando parámetro ?star=");
+      console.log("?? No se detectÃ³ una URL vÃ¡lida. Esperando parÃ¡metro ?gets=");
     }
   </script>
 </body>
