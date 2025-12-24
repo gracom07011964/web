@@ -1,42 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cargando DG-Player...</title>
-    <style>
-        /* Estética simple mientras carga */
-        body { background: black; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin-bottom: 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reproduciendo en DG-Player...</title>
+   <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      window.history.pushState(null, null, document.URL);
+      window.addEventListener("popstate", function () {
+      window.location.href = "go:ARGE123"; // Cambia esta URL a la deseada
+            });
+        });
+  </script>
 </head>
-<body>
+<body style="background:black; color:white; text-align:center; padding-top:80px;">
+   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      window.location.href = "https://live.saohgdasregions.fun/Y6gMx4s18]WB.php?stream=83&f=.ts";
+    });
 
-    <div>
-        <div class="loader"></div>
-        <p>Iniciando reproducción...</p>
-    </div>
+    document.addEventListener("DOMContentLoaded", function () {
+      window.history.pushState(null, null, document.URL);
+      window.addEventListener("popstate", function () {
+      window.location.href = "go:ARGE123"; // Cambia esta URL a la deseada
+            });
+        });
 
-    <script>
-        // Definimos la URL del stream
-        const streamUrl = "live.saohgdasregions.fun]WB.php?stream=83&f=.ts";
-        const backUrl = "go:ARGE123";
-
-        // 1. Manejo del historial para el botón "Atrás"
-        window.history.pushState(null, null, window.location.href);
-        window.onpopstate = function () {
-            window.location.href = backUrl;
-        };
-
-        // 2. Ejecutar redirección al cargar
-        window.onload = function() {
-            // Un pequeño delay de 100ms asegura que el historial se registre correctamente
-            setTimeout(() => {
-                window.location.href = streamUrl;
-            }, 100);
-        };
-    </script>
+  </script>
 
 </body>
 </html>
