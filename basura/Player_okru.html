@@ -3,83 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reproductor TV Fullscreen</title>
+<title>Reproductor Android TV</title>
+
 <style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    background: black;
-    overflow: hidden;
-  }
-  iframe {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    border: none;
-    background: black;
-  }
-  #btnFull {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(255,255,255,0.2);
-    color: white;
-    border: 1px solid white;
-    border-radius: 6px;
-    padding: 10px 18px;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  #btnFull:focus {
-    outline: 3px solid yellow;
-  }
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  overflow: hidden;
+}
+
+video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: contain;
+  background: black;
+}
 </style>
 </head>
+
 <body>
 
-<div id="contenedor"></div>
-<button id="btnFull">? Pantalla completa</button>
+<video id="player"
+  autoplay
+  muted
+  controls
+  playsinline>
+</video>
 
 <script>
 function obtenerParametro(nombre) {
-  const params = new URLSearchParams(window.location.search);
-  return params.get(nombre);
+  return new URLSearchParams(window.location.search).get(nombre);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const contenedor = document.getElementById('contenedor');
-  const videoURL = obtenerParametro('star');
-  const boton = document.getElementById('btnFull');
+  const video = document.getElementById('player');
+  const url = obtenerParametro('star');
 
-  if (videoURL) {
-    const iframe = document.createElement('iframe');
-    iframe.src = videoURL.includes("autoplay") ? videoURL : videoURL + "?autoplay=1";
-    iframe.allow = "autoplay; fullscreen";
-    iframe.allowFullscreen = true;
-    contenedor.appendChild(iframe);
-
-    // Control remoto (ENTER para fullscreen)
-    document.addEventListener('keydown', (e) => {
-      if (e.key === "Enter") {
-        const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
-        if (reqFull) reqFull.call(iframe);
-      }
-    });
-
-    // Click o ENTER sobre el botón activa fullscreen
-    boton.addEventListener('click', () => {
-      const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
-      if (reqFull) reqFull.call(iframe);
-    });
-
-    boton.focus(); // Foco inicial para control remoto
-  } else {
-    contenedor.innerHTML = '<div style="color:white;text-align:center;margin-top:30%;">? No se encontró el parámetro <b>?star=</b> con la URL del video.</div>';
+  if (!url) {
+    document.body.innerHTML =
+      '<h2 style="color:white;text-align:center;margin-top:30%;">? Falta parámetro ?star=</h2>';
+    return;
   }
+
+  video.src = url;
+
+  // Reproducir automáticamente
+  video.play().catch(() => {
+    console.log("Autoplay bloqueado, esperando interacción");
+  });
+
+  // Forzar fullscreen al iniciar
+  video.addEventListener('loadedmetadata', () => {
+    const fs =
+      video.requestFullscreen ||
+      video.webkitRequestFullscreen ||
+      video.mozRequestFullScreen ||
+      video.msRequestFullscreen;
+
+    if (fs) fs.call(video);
+  });
+
+  // ENTER del control remoto
+  document.addEventListener('keydown', e => {
+    if (e.key === "Enter") {
+      video.play();
+    }
+  });
 });
 </script>
 
