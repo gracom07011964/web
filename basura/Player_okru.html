@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reproductor Externo Fullscreen</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    overflow: hidden;
+  }
+  iframe {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+    background: black;
+  }
+  #mensaje {
+    color: white;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 20%;
+  }
+  #btnFull {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid white;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="contenedor"></div>
+
+<script>
+  // Función para obtener el parámetro ?start=
+  function obtenerParametro(nombre) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(nombre);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const contenedor = document.getElementById('contenedor');
+    const videoURL = obtenerParametro('start');
+
+    if (videoURL) {
+      const iframe = document.createElement('iframe');
+      iframe.src = videoURL.includes("autoplay") ? videoURL : videoURL + "?autoplay=1";
+      iframe.allow = "autoplay; fullscreen";
+      iframe.allowFullscreen = true;
+      contenedor.appendChild(iframe);
+
+      // Botón manual de pantalla completa (por si el automático falla)
+      const boton = document.createElement('button');
+      boton.id = "btnFull";
+      boton.textContent = "Pantalla completa";
+      boton.onclick = () => {
+        const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
+        if (reqFull) reqFull.call(iframe);
+      };
+      document.body.appendChild(boton);
+
+      // Intentar fullscreen automático (algunos navegadores lo bloquean)
+      iframe.addEventListener('load', () => {
+        const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
+        if (reqFull) {
+          try { reqFull.call(iframe); } 
+          catch(e) { console.warn("No se pudo activar fullscreen automático"); }
+        }
+      });
+    } else {
+      contenedor.innerHTML = '<div id="mensaje">? No se encontró el parámetro <b>?start=</b> con la URL del video.</div>';
+    }
+  });
+</script>
+
+</body>
+</html>
