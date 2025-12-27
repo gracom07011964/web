@@ -47,7 +47,7 @@
 <div id="contenedor"></div>
 
 <script>
-  // FunciÛn para obtener el par·metro ?start=
+  // Funci√≥n para obtener el par√°metro ?star=
   function obtenerParametro(nombre) {
     const params = new URLSearchParams(window.location.search);
     return params.get(nombre);
@@ -55,7 +55,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     const contenedor = document.getElementById('contenedor');
-    const videoURL = obtenerParametro('start');
+    const videoURL = obtenerParametro('star');
 
     if (videoURL) {
       const iframe = document.createElement('iframe');
@@ -64,7 +64,7 @@
       iframe.allowFullscreen = true;
       contenedor.appendChild(iframe);
 
-      // BotÛn manual de pantalla completa (por si el autom·tico falla)
+      // Bot√≥n manual de pantalla completa (por si el autom√°tico falla)
       const boton = document.createElement('button');
       boton.id = "btnFull";
       boton.textContent = "Pantalla completa";
@@ -74,16 +74,16 @@
       };
       document.body.appendChild(boton);
 
-      // Intentar fullscreen autom·tico (algunos navegadores lo bloquean)
+      // Intentar fullscreen autom√°tico (algunos navegadores lo bloquean)
       iframe.addEventListener('load', () => {
         const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
         if (reqFull) {
           try { reqFull.call(iframe); } 
-          catch(e) { console.warn("No se pudo activar fullscreen autom·tico"); }
+          catch(e) { console.warn("No se pudo activar fullscreen autom√°tico"); }
         }
       });
     } else {
-      contenedor.innerHTML = '<div id="mensaje">? No se encontrÛ el par·metro <b>?start=</b> con la URL del video.</div>';
+      contenedor.innerHTML = '<div id="mensaje">? No se encontr√≥ el par√°metro <b>?star=</b> con la URL del video.</div>';
     }
   });
 </script>
