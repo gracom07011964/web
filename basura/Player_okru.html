@@ -15,20 +15,40 @@ html, body {
   overflow: hidden;
 }
 
-iframe {
+#container {
   width: 100vw;
   height: 100vh;
+  position: relative;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
   border: 0;
+}
+
+/* Botón invisible que recibe ENTER */
+#playBtn {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: none;
+  outline: none;
 }
 </style>
 </head>
 
 <body>
 
-<iframe id="player"
-  allow="autoplay; fullscreen"
-  allowfullscreen>
-</iframe>
+<div id="container">
+  <iframe id="player"
+    allow="autoplay; fullscreen"
+    allowfullscreen>
+  </iframe>
+
+  <!-- Botón invisible -->
+  <button id="playBtn"></button>
+</div>
 
 <script>
 function obtenerParametro(nombre) {
@@ -37,37 +57,36 @@ function obtenerParametro(nombre) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const iframe = document.getElementById('player');
+  const playBtn = document.getElementById('playBtn');
+
   let url = obtenerParametro('star');
 
   if (!url) {
     document.body.innerHTML =
-      '<h2 style="color:white;text-align:center;margin-top:30%;">Falta parámetro ?star=</h2>';
+      '<h2 style="color:white;text-align:center;margin-top:30%;">Falta ?star=</h2>';
     return;
   }
 
-  // Convertir URL normal de OK.RU a embebida
-  if (!url.includes('/videoembed/')) {
+  // Convertir a embed OK.RU
+  if (!url.includes('videoembed')) {
     const id = url.split('/').pop();
-    url = `https://ok.ru/videoembed/${id}?autoplay=1`;
+    url = `https://ok.ru/videoembed/${id}`;
   }
 
   iframe.src = url;
 
-  // Forzar fullscreen (Android TV)
-  setTimeout(() => {
-    const fs =
-      iframe.requestFullscreen ||
-      iframe.webkitRequestFullscreen ||
-      iframe.mozRequestFullScreen ||
-      iframe.msRequestFullscreen;
+  // Foco automático (clave para Android TV)
+  playBtn.focus();
 
-    if (fs) fs.call(iframe);
-  }, 1000);
+  // ENTER = gesto real
+  playBtn.addEventListener('click', () => {
+    iframe.src = iframe.src; // recarga ? reproduce
+  });
 
   // ENTER del control remoto
   document.addEventListener('keydown', e => {
     if (e.key === "Enter") {
-      iframe.src = iframe.src; // recarga y reproduce
+      playBtn.click();
     }
   });
 });
