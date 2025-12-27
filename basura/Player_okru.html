@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reproductor Android TV</title>
+<title>OK.RU Android TV</title>
 
 <style>
 html, body {
@@ -15,23 +15,20 @@ html, body {
   overflow: hidden;
 }
 
-video {
+iframe {
   width: 100vw;
   height: 100vh;
-  object-fit: contain;
-  background: black;
+  border: 0;
 }
 </style>
 </head>
 
 <body>
 
-<video id="player"
-  autoplay
-  muted
-  controls
-  playsinline>
-</video>
+<iframe id="player"
+  allow="autoplay; fullscreen"
+  allowfullscreen>
+</iframe>
 
 <script>
 function obtenerParametro(nombre) {
@@ -39,37 +36,38 @@ function obtenerParametro(nombre) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const video = document.getElementById('player');
-  const url = obtenerParametro('star');
+  const iframe = document.getElementById('player');
+  let url = obtenerParametro('star');
 
   if (!url) {
     document.body.innerHTML =
-      '<h2 style="color:white;text-align:center;margin-top:30%;">? Falta parámetro ?star=</h2>';
+      '<h2 style="color:white;text-align:center;margin-top:30%;">Falta parámetro ?star=</h2>';
     return;
   }
 
-  video.src = url;
+  // Convertir URL normal de OK.RU a embebida
+  if (!url.includes('/videoembed/')) {
+    const id = url.split('/').pop();
+    url = `https://ok.ru/videoembed/${id}?autoplay=1`;
+  }
 
-  // Reproducir automáticamente
-  video.play().catch(() => {
-    console.log("Autoplay bloqueado, esperando interacción");
-  });
+  iframe.src = url;
 
-  // Forzar fullscreen al iniciar
-  video.addEventListener('loadedmetadata', () => {
+  // Forzar fullscreen (Android TV)
+  setTimeout(() => {
     const fs =
-      video.requestFullscreen ||
-      video.webkitRequestFullscreen ||
-      video.mozRequestFullScreen ||
-      video.msRequestFullscreen;
+      iframe.requestFullscreen ||
+      iframe.webkitRequestFullscreen ||
+      iframe.mozRequestFullScreen ||
+      iframe.msRequestFullscreen;
 
-    if (fs) fs.call(video);
-  });
+    if (fs) fs.call(iframe);
+  }, 1000);
 
   // ENTER del control remoto
   document.addEventListener('keydown', e => {
     if (e.key === "Enter") {
-      video.play();
+      iframe.src = iframe.src; // recarga y reproduce
     }
   });
 });
