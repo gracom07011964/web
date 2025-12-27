@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Reproductor Externo Fullscreen</title>
+<title>Video OK.ru</title>
 <style>
   html, body {
     margin: 0;
@@ -22,12 +22,6 @@
     border: none;
     background: black;
   }
-  #mensaje {
-    color: white;
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin-top: 20%;
-  }
   #btnFull {
     position: fixed;
     bottom: 10px;
@@ -44,47 +38,27 @@
 </head>
 <body>
 
-<div id="contenedor"></div>
+<iframe 
+  id="videoFrame"
+  src="https://ok.ru/videoembed/5248148703767?autoplay=1" 
+  allow="autoplay; fullscreen" 
+  allowfullscreen>
+</iframe>
+
+<button id="btnFull">Pantalla completa</button>
 
 <script>
-  // Función para obtener el parámetro ?star=
-  function obtenerParametro(nombre) {
-    const params = new URLSearchParams(window.location.search);
-    return params.get(nombre);
-  }
+  const iframe = document.getElementById('videoFrame');
+  const boton = document.getElementById('btnFull');
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const contenedor = document.getElementById('contenedor');
-    const videoURL = obtenerParametro('star');
+  boton.onclick = () => {
+    const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
+    if (reqFull) reqFull.call(iframe);
+  };
 
-    if (videoURL) {
-      const iframe = document.createElement('iframe');
-      iframe.src = videoURL.includes("autoplay") ? videoURL : videoURL + "?autoplay=1";
-      iframe.allow = "autoplay; fullscreen";
-      iframe.allowFullscreen = true;
-      contenedor.appendChild(iframe);
-
-      // Botón manual de pantalla completa (por si el automático falla)
-      const boton = document.createElement('button');
-      boton.id = "btnFull";
-      boton.textContent = "Pantalla completa";
-      boton.onclick = () => {
-        const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
-        if (reqFull) reqFull.call(iframe);
-      };
-      document.body.appendChild(boton);
-
-      // Intentar fullscreen automático (algunos navegadores lo bloquean)
-      iframe.addEventListener('load', () => {
-        const reqFull = iframe.requestFullscreen || iframe.webkitRequestFullscreen;
-        if (reqFull) {
-          try { reqFull.call(iframe); } 
-          catch(e) { console.warn("No se pudo activar fullscreen automático"); }
-        }
-      });
-    } else {
-      contenedor.innerHTML = '<div id="mensaje">? No se encontró el parámetro <b>?star=</b> con la URL del video.</div>';
-    }
+  // Intentar autoplay en móviles
+  window.addEventListener('load', () => {
+    iframe.src += '&muted=1'; // permite autoplay en móviles
   });
 </script>
 
