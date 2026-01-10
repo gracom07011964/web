@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <title>Reproductor</title>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex">
+  <meta http-equiv="Content-Language" content="es">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="referrer" content="no-referrer">
+
+  <!-- JWPlayer -->
+  <script src="https://ssl.p.jwpcdn.com/player/v/8.26.0/jwplayer.js"></script>
+  <script>
+    jwplayer.key = "XSuP4qMl+9tK17QNb+4+th2Pm9AWgMO/cYH8CI0HGGr7bdjo";
+  </script>
+</head>
+
+<body bgcolor="black" style="margin:0;">
+  <div id="player"></div>
+
+  <script>
+    /* =========================
+       PARÁMETROS GET
+    ========================== */
+    const params = new URLSearchParams(window.location.search);
+    const canal = params.get("get") || "natgeo";
+    const lang  = parseInt(params.get("lang")) || 1;
+
+    /* =========================
+       CANALES (MISMO FORMATO
+       QUE TU CÓDIGO ORIGINAL)
+    ========================== */
+    let file = "";
+    let keyId = "";
+    let key = "";
+
+    if (canal === "natgeo") {
+      file = "https://chromecast.cvattv.com.ar/live/c3eds/NatGeoHD/SA_Live_dash_enc_C/NatGeoHD.mpd";
+      keyId = "4be0c61ceddc62294cc9e23b627af53d";
+      key   = "852c1935d11c3c53d0a1ceff3bb3bf16";
+    } else {
+      alert("Canal inválido");
+      throw new Error("Canal inválido");
+    }
+
+    /* =========================
+       PLAYER (NO MODIFICADO)
+    ========================== */
+    const playerInstance = jwplayer("player");
+
+    playerInstance.setup({
+      playlist: [{
+        sources: [{
+          file: file,
+          drm: {
+            clearkey: {
+              keyId: keyId,
+              key: key
+            }
+          }
+        }]
+      }],
+      width: "100%",
+      height: "100vh",
+      autostart: true,
+      mute: false,
+      cast: {},
+      sharing: {}
+    });
+
+    /* =========================
+       AUDIO (MISMA LÓGICA
+       QUE TU CÓDIGO)
+    ========================== */
+    playerInstance.on("audioTracks", function(e) {
+      console.log("Pistas disponibles:", e.tracks);
+
+      // índice por defecto (español)
+      let index = 1;
+
+      // si hay 2 pistas y pidieron lang=2 → usar pista 1
+      if (e.tracks.length > 1 && lang === 2) {
+        index = 1;
+      }
+
+      playerInstance.setCurrentAudioTrack(index);
+    });
+  </script>
+</body>
+</html>
