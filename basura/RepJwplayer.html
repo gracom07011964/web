@@ -40,7 +40,11 @@
       file = "https://chromecast.cvattv.com.ar/live/c3eds/NatGeoHD/SA_Live_dash_enc_C/NatGeoHD.mpd";
       keyId = "4be0c61ceddc62294cc9e23b627af53d";
       key   = "852c1935d11c3c53d0a1ceff3bb3bf16";
-    } else {
+     } else if (canal === "canal13") {
+      file = "https://chromecast.cvattv.com.ar/live/c3eds/ArtearHD/SA_Live_dash_enc_C/ArtearHD.mpd";
+      keyId = "5179017f49326d14af0a9ceec831aee6";
+      key = "09b4a463b029ebc28a288bed2da70a76";
+     } else {
       alert("Canal inválido");
       throw new Error("Canal inválido");
     }
