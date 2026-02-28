@@ -1,43 +1,64 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reproductor Live YouTube</title>
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <title>Clappr Live Bypass</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr-hlsjs-playback@latest/dist/clappr-hlsjs-playback.min.js"></script>
     <style>
-        body { background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .container { width: 100%; max-width: 800px; }
+        body { margin: 0; background: #000; color: white; font-family: sans-serif; }
+        #player { width: 100vw; height: 100vh; }
+        #status { position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="M_gUd2Bp9g0"></div>
-</div>
+<div id="status">Cargando flujo...</div>
+<div id="player"></div>
 
-<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const player = new Plyr('#player', {
-            autoplay: true,
-            muted: false,
-            // Configuraciones críticas para evitar bloqueos
-            youtube: {
-                noCookie: false, // Cambiar a true si el error persiste
-                rel: 0,
-                showinfo: 0,
-                iv_load_policy: 3,
-                modestbranding: 1
-            }
-        });
+    // 1. Configuración
+    const VIDEO_ID = 'M_gUd2Bp9g0'; // Ej: 'jfKfPfyJRdk'
+    const INVIDIOUS_INSTANCE = 'https://inv.tux.digital'; // Puedes cambiarla si falla
 
-        // Manejo de errores para depurar si salta el bot
-        player.on('error', (event) => {
-            console.error('Error en el reproductor:', event);
-            alert('Si ves el mensaje de bot, intenta iniciar sesión en Google en otra pestaña.');
-        });
-    });
+    async function setupPlayer() {
+        const statusEl = document.getElementById('status');
+        
+        try {
+            // 2. Consultar la API de Invidious para obtener el flujo
+            statusEl.innerText = "Obteniendo datos de la API...";
+            const response = await fetch(`${INVIDIOUS_INSTANCE}/api/v1/videos/${VIDEO_ID}`);
+            const data = await response.json();
+
+            // 3. Buscar el formato HLS (m3u8) que es el que usa Clappr para Live
+            // Invidious suele devolverlo en data.hls
+            if (data.hls) {
+                statusEl.innerText = "¡Enlace obtenido! Iniciando Clappr...";
+                
+                var player = new Clappr.Player({
+                    source: data.hls,
+                    parentId: "#player",
+                    plugins: [HlsjsPlayback],
+                    mimeType: "application/x-mpegURL",
+                    autoPlay: true,
+                    width: '100%',
+                    height: '100%',
+                    actualLiveTime: true,
+                    playbackNotSupportedMessage: 'Tu navegador no soporta este video.'
+                });
+                
+                statusEl.style.display = 'none'; // Ocultar estado si funciona
+            } else {
+                statusEl.innerText = "No se encontró un flujo HLS para este video.";
+            }
+
+        } catch (error) {
+            console.error(error);
+            statusEl.innerText = "Error: La instancia está caída o el video tiene restricciones.";
+        }
+    }
+
+    setupPlayer();
 </script>
 
 </body>
