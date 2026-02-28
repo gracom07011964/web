@@ -1,71 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="referrer" content="no-referrer-when-downgrade">
-  <title>LN+ Live TV</title>
-  <style>
-    body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
-    #container { position: relative; width: 100vw; height: 100vh; }
-    iframe { width: 100%; height: 100%; border: none; }
-    
-    #overlay {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); z-index: 10;
-      display: flex; justify-content: center; align-items: center;
-    }
-    .btn-tv {
-      padding: 25px 50px; font-size: 1.8rem; color: white;
-      border: 3px solid #fff; background: #c00; cursor: pointer;
-      border-radius: 10px; font-family: sans-serif;
-    }
-    .btn-tv:focus { background: #fff; color: #000; transform: scale(1.05); }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor Live YouTube</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <style>
+        body { background: #000; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .container { width: 100%; max-width: 800px; }
+    </style>
 </head>
 <body>
 
-  <div id="overlay">
-    <button id="start-btn" class="btn-tv" autofocus onclick="loadLive()">VER LN+ EN VIVO</button>
-  </div>
+<div class="container">
+    <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="M_gUd2Bp9g0"></div>
+</div>
 
-  <div id="container">
-    <div id="player-wrapper"></div>
-  </div>
+<script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const player = new Plyr('#player', {
+            autoplay: true,
+            muted: false,
+            // Configuraciones críticas para evitar bloqueos
+            youtube: {
+                noCookie: false, // Cambiar a true si el error persiste
+                rel: 0,
+                showinfo: 0,
+                iv_load_policy: 3,
+                modestbranding: 1
+            }
+        });
 
-  <script>
-    function loadLive() {
-      // 1. Ocultamos el overlay
-      document.getElementById('overlay').style.display = 'none';
+        // Manejo de errores para depurar si salta el bot
+        player.on('error', (event) => {
+            console.error('Error en el reproductor:', event);
+            alert('Si ves el mensaje de bot, intenta iniciar sesión en Google en otra pestaña.');
+        });
+    });
+</script>
 
-      // 2. Usamos el ID directo del vivo de LN+ 
-      // NOTA: Si el ID cambia, debes actualizar 'M_gUd2Bp9g0'
-      const videoId = 'M_gUd2Bp9g0';
-      
-      // 3. CONSTRUCCIÓN DEL EMBED MANUAL (Más difícil de detectar que la API JS)
-      const iframe = document.createElement('iframe');
-      
-      // Parámetros clave para evitar el bloqueo de bot:
-      // - hl=es: Fuerza el idioma español
-      // - autoplay=1 y mute=0: Intentamos que arranque con sonido
-      // - widget_referrer: Engañamos sobre el origen
-      const embedUrl = `https://www.youtube.com/embed/${videoId}?` + 
-                       `autoplay=1&` +
-                       `modestbranding=1&` +
-                       `rel=0&` +
-                       `hl=es&` +
-                       `enablejsapi=1&` +
-                       `origin=${window.location.origin}`;
-
-      iframe.setAttribute('src', embedUrl);
-      iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
-      iframe.setAttribute('allowfullscreen', '');
-      
-      document.getElementById('player-wrapper').appendChild(iframe);
-    }
-
-    // Foco para el control remoto
-    window.onload = () => { document.getElementById('start-btn').focus(); };
-  </script>
 </body>
 </html>
+
+
+
 
