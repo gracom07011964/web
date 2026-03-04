@@ -1,69 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Clappr Live Bypass</title>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clappr-hlsjs-playback@latest/dist/clappr-hlsjs-playback.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <style>
-        body { margin: 0; background: #000; color: white; font-family: sans-serif; }
-        #player { width: 100vw; height: 100vh; }
-        #status { position: absolute; top: 10px; left: 10px; z-index: 10; background: rgba(0,0,0,0.5); padding: 5px; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body, html { 
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background-color: #000; 
+        }
+
+        .video-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Ajuste específico para el reproductor Plyr */
+        .plyr {
+            height: 100% !important;
+            width: 100% !important;
+        }
     </style>
 </head>
 <body>
 
-<div id="status">Cargando flujo...</div>
-<div id="player"></div>
+<div class="video-container">
+    <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="M_gUd2Bp9g0"></div>
+</div>
 
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script>
-    // 1. Configuración
-    const VIDEO_ID = 'M_gUd2Bp9g0'; // Ej: 'jfKfPfyJRdk'
-    const INVIDIOUS_INSTANCE = 'https://inv.tux.digital'; // Puedes cambiarla si falla
+    const player = new Plyr('#player', {
+        fullscreen: { enabled: true, fallback: true, iosNative: true },
+        autoplay: true,
+        ratio: '16:9' // Ajusta esto si tu video tiene otro formato
+    });
 
-    async function setupPlayer() {
-        const statusEl = document.getElementById('status');
-        
-        try {
-            // 2. Consultar la API de Invidious para obtener el flujo
-            statusEl.innerText = "Obteniendo datos de la API...";
-            const response = await fetch(`${INVIDIOUS_INSTANCE}/api/v1/videos/${VIDEO_ID}`);
-            const data = await response.json();
-
-            // 3. Buscar el formato HLS (m3u8) que es el que usa Clappr para Live
-            // Invidious suele devolverlo en data.hls
-            if (data.hls) {
-                statusEl.innerText = "¡Enlace obtenido! Iniciando Clappr...";
-                
-                var player = new Clappr.Player({
-                    source: data.hls,
-                    parentId: "#player",
-                    plugins: [HlsjsPlayback],
-                    mimeType: "application/x-mpegURL",
-                    autoPlay: true,
-                    width: '100%',
-                    height: '100%',
-                    actualLiveTime: true,
-                    playbackNotSupportedMessage: 'Tu navegador no soporta este video.'
-                });
-                
-                statusEl.style.display = 'none'; // Ocultar estado si funciona
-            } else {
-                statusEl.innerText = "No se encontró un flujo HLS para este video.";
-            }
-
-        } catch (error) {
-            console.error(error);
-            statusEl.innerText = "Error: La instancia está caída o el video tiene restricciones.";
-        }
-    }
-
-    setupPlayer();
+    // Forzar pantalla completa al estar listo
+    player.on('ready', (event) => {
+        // Un pequeño delay ayuda a que el WebView se asiente antes de expandir
+        setTimeout(() => {
+            player.fullscreen.enter();
+        }, 500);
+    });
 </script>
-
 </body>
 </html>
-
 
 
 
