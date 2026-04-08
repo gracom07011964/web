@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Reproductor Premium Protegido</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visor TV</title>
 
   <style>
     body, html {
@@ -13,175 +13,145 @@
       height: 100%;
       background: #000;
       overflow: hidden;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    /* Contenedor principal */
-    .reproductor-container {
+    .main-container {
       position: relative;
       width: 100vw;
       height: 100vh;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    /* Cabecera minimalista */
-    header {
-      background: #1a1a1a;
-      color: #00e676;
-      padding: 10px;
-      font-size: 14px;
-      text-align: center;
-      border-bottom: 1px solid #333;
-      z-index: 100;
-    }
-
-    /* El visor donde se carga el contenido */
-    iframe {
-      flex-grow: 1;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #000;
-    }
-
-    /* Capa invisible que atrapa el primer clic publicitario */
+    /* ESCUDO PARA CONTROL REMOTO */
+    /* Se asegura de capturar el foco del botón "OK" del control */
     #escudo-clics {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.01); /* Casi invisible */
-      z-index: 999; /* Por encima de todo */
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: rgba(0, 0, 0, 0.01); 
+      z-index: 2147483647;
+      outline: none; /* Elimina el borde de enfoque en TV */
     }
 
-    /* Mensaje opcional sobre el escudo */
-    #escudo-clics span {
-      background: rgba(0,0,0,0.7);
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 20px;
-      font-size: 12px;
-      pointer-events: none;
-      opacity: 0.8;
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
     }
 
-    /* Loader */
     #loader {
       position: fixed;
       inset: 0;
       background: #000;
-      color: #00e676;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
-      transition: opacity 0.5s ease;
+      z-index: 2147483646;
+      transition: opacity 0.5s;
     }
 
-    .hidden {
-      opacity: 0;
-      pointer-events: none;
+    /* Spinner más visible para TV */
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 6px solid #222;
+      border-top: 6px solid #3d5afe;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    .ocultar-escudo {
-      display: none !important;
-    }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .hidden { opacity: 0; pointer-events: none; }
   </style>
 </head>
-
 <body>
 
-  <div id="loader">
-    <div style="font-size: 24px; margin-bottom: 10px;">⌛</div>
-    <div id="loader-text">Iniciando conexión segura...</div>
-  </div>
+  <div id="loader"><div class="spinner"></div></div>
 
-  <div class="reproductor-container">
-    <header id="status-bar">Reproductor Antipopups Activo</header>
-    
-    <div id="escudo-clics">
-      <span>Toca una vez para desbloquear controles</span>
-    </div>
+  <div class="main-container">
+    <div id="escudo-clics" tabindex="1"></div>
 
     <iframe 
       id="visor"
-      sandbox="allow-same-origin allow-scripts allow-forms"
+      sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
       referrerpolicy="no-referrer"
-      allowfullscreen
+      allow="autoplay; fullscreen"
       src="">
     </iframe>
   </div>
 
   <script>
     const visor = document.getElementById('visor');
-    const loader = document.getElementById('loader');
     const escudo = document.getElementById('escudo-clics');
+    const loader = document.getElementById('loader');
 
-    // 1. Obtener URL del parámetro ?star=
-    function getParameter(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
+    function getParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
     }
 
-    // 2. Bloqueo de funciones de ventana (Anti-Popups)
-    (function proteger() {
-      window.open = () => { console.warn("🚫 Popup bloqueado"); return null; };
-      
-      // Intentar bloquear redirecciones de la ventana principal
-      try {
-        Object.defineProperty(window, 'onbeforeunload', {
-          configurable: false,
-          writeable: false,
-          value: function() { console.log("Previniendo salida..."); }
-        });
-      } catch (e) {}
-    })();
+    // Forzar el foco en el escudo al cargar para que el primer "OK" sea capturado
+    window.onload = () => {
+      escudo.focus();
+    };
 
-    // 3. Manejo del Escudo de Clics
-    escudo.addEventListener('click', () => {
-      escudo.classList.add('ocultar-escudo');
-      console.log("🛡️ Escudo desactivado. Ahora puedes usar el reproductor.");
+    // Bloqueo de ventanas emergentes
+    window.open = () => null;
+
+    // Función para limpiar el escudo (para Clic o Botón OK del control)
+    function desbloquear() {
+      console.log("TV: Desbloqueando protector...");
+      escudo.style.pointerEvents = 'none';
+      setTimeout(() => {
+        escudo.remove();
+        // Intentar dar foco al iframe para que el control remoto controle el video
+        visor.focus();
+      }, 400);
+    }
+
+    escudo.addEventListener('click', desbloquear);
+    
+    // Soporte específico para teclas de control remoto (Enter / OK)
+    escudo.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.keyCode === 13) {
+        desbloquear();
+      }
     });
 
-    // 4. Carga y Limpieza
-    const urlParam = getParameter('star');
+    const url = getParam('star');
+    if (url && url.startsWith('http')) {
+      visor.src = url;
 
-    if (urlParam && urlParam.startsWith('http')) {
-      visor.src = urlParam;
+      visor.onload = () => {
+        loader.classList.add('hidden');
 
-      visor.addEventListener('load', () => {
-        // Ocultar loader
-        setTimeout(() => {
-          loader.classList.add('hidden');
-        }, 800);
-
-        // Intento de inyección de CSS para ocultar capas de imágenes (si el sitio lo permite)
+        // Limpieza de capas (Si el sitio permite inyección)
         try {
-          const style = document.createElement('style');
-          style.textContent = `
-            div[class*="ads"], div[id*="ads"], .adsbygoogle, 
-            div[style*="z-index: 99999"], div[style*="z-index: 2147483647"],
-            img[src*="banner"], a[href*="doubleclick"] {
+          const styleTag = document.createElement('style');
+          styleTag.innerHTML = `
+            div[class*="overlay"], div[class*="popup"], 
+            div[style*="z-index: 9999"], div[style*="z-index: 2147483647"],
+            .ad-container, img[src*="banner"] {
               display: none !important;
+              visibility: hidden !important;
+              height: 0px !important;
             }
           `;
-          visor.contentDocument.head.appendChild(style);
+          visor.contentDocument.head.appendChild(styleTag);
         } catch (e) {
-          console.log("🛡️ Protección de Sandbox activa (CORS bloqueó inyección manual).");
+          console.log("Protección Sandbox activa para TV.");
         }
-      });
+      };
     } else {
-      document.getElementById('loader-text').innerHTML = "❌ Error: No hay URL válida.<br><small>Usa ?star=https://...</small>";
+      loader.innerHTML = "<div style='color:white;'>Inserte URL en ?star=</div>";
     }
   </script>
-
 </body>
 </html>
 
