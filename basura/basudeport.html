@@ -2,137 +2,186 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Reproductor Seguro Antipopups</title>
+  <title>Reproductor Premium Protegido</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #101010;
-      color: #f0f0f0;
-      text-align: center;
+    body, html {
       margin: 0;
       padding: 0;
-    }
-
-    h1 {
-      background: #1976d2;
-      padding: 15px;
-      margin: 0;
-      font-size: 20px;
-    }
-
-    iframe {
       width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* Contenedor principal */
+    .reproductor-container {
+      position: relative;
+      width: 100vw;
       height: 100vh;
-      border: black;
-      border-radius: 8px;
-      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Cabecera minimalista */
+    header {
+      background: #1a1a1a;
+      color: #00e676;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      border-bottom: 1px solid #333;
+      z-index: 100;
+    }
+
+    /* El visor donde se carga el contenido */
+    iframe {
+      flex-grow: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
       background: #000;
     }
 
-    #loader {
-      position: fixed;
+    /* Capa invisible que atrapa el primer clic publicitario */
+    #escudo-clics {
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      color: #fff;
+      background: rgba(0, 0, 0, 0.01); /* Casi invisible */
+      z-index: 999; /* Por encima de todo */
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 20px;
-      z-index: 9999;
-      transition: opacity 0.6s ease;
     }
 
-    footer {
-      font-size: 13px;
-      color: #aaa;
-      margin-top: 10px;
+    /* Mensaje opcional sobre el escudo */
+    #escudo-clics span {
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 12px;
+      pointer-events: none;
+      opacity: 0.8;
+    }
+
+    /* Loader */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      color: #00e676;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.5s ease;
     }
 
     .hidden {
       opacity: 0;
       pointer-events: none;
     }
+
+    .ocultar-escudo {
+      display: none !important;
+    }
   </style>
 </head>
 
 <body>
-  <div id="loader"> Espere un momento…. </div>
 
-  <iframe 
-    id="visor"
-    sandbox="allow-same-origin allow-scripts"
-    referrerpolicy="no-referrer"
-    src="">
-  </iframe>
+  <div id="loader">
+    <div style="font-size: 24px; margin-bottom: 10px;">⌛</div>
+    <div id="loader-text">Iniciando conexión segura...</div>
+  </div>
 
-  <footer>  </footer>
+  <div class="reproductor-container">
+    <header id="status-bar">Reproductor Antipopups Activo</header>
+    
+    <div id="escudo-clics">
+      <span>Toca una vez para desbloquear controles</span>
+    </div>
+
+    <iframe 
+      id="visor"
+      sandbox="allow-same-origin allow-scripts allow-forms"
+      referrerpolicy="no-referrer"
+      allowfullscreen
+      src="">
+    </iframe>
+  </div>
 
   <script>
-    // ?? Obtener parámetros de la URL
+    const visor = document.getElementById('visor');
+    const loader = document.getElementById('loader');
+    const escudo = document.getElementById('escudo-clics');
+
+    // 1. Obtener URL del parámetro ?star=
     function getParameter(name) {
       const params = new URLSearchParams(window.location.search);
       return params.get(name);
     }
 
-    // ?? Bloqueo avanzado de popups y redirecciones
-    (function protegerVentanas() {
-      window.open = function() {
-        console.warn("?? Popup bloqueado (window.open interceptado)");
-        return null;
-      };
-
-      const bloquearRedirecciones = function() {
-        console.warn("?? Redirección bloqueada.");
-      };
-      window.location.assign = bloquearRedirecciones;
-      window.location.replace = bloquearRedirecciones;
-
-      document.addEventListener('click', function(e) {
-        const t = e.target.tagName.toLowerCase();
-        if (t === 'a' && e.target.target === '_blank') {
-          e.preventDefault();
-          console.warn("?? Enlace externo bloqueado.");
-        }
-      }, true);
-
+    // 2. Bloqueo de funciones de ventana (Anti-Popups)
+    (function proteger() {
+      window.open = () => { console.warn("🚫 Popup bloqueado"); return null; };
+      
+      // Intentar bloquear redirecciones de la ventana principal
       try {
-        Object.defineProperty(window.top, 'location', {
+        Object.defineProperty(window, 'onbeforeunload', {
           configurable: false,
-          enumerable: true,
-          writable: false,
-          value: window.top.location
+          writeable: false,
+          value: function() { console.log("Previniendo salida..."); }
         });
-      } catch (e) {
-        console.warn("?? Protección top.location aplicada.");
-      }
+      } catch (e) {}
     })();
 
-    // ?? Carga automática del enlace pasado en ?star=
+    // 3. Manejo del Escudo de Clics
+    escudo.addEventListener('click', () => {
+      escudo.classList.add('ocultar-escudo');
+      console.log("🛡️ Escudo desactivado. Ahora puedes usar el reproductor.");
+    });
+
+    // 4. Carga y Limpieza
     const urlParam = getParameter('star');
-    const visor = document.getElementById('visor');
-    const loader = document.getElementById('loader');
 
     if (urlParam && urlParam.startsWith('http')) {
-      loader.classList.remove('hidden'); // muestra mensaje
       visor.src = urlParam;
-      console.log("?? Reproduciendo:", urlParam);
 
-      // Oculta el mensaje cuando carga la página
       visor.addEventListener('load', () => {
+        // Ocultar loader
         setTimeout(() => {
           loader.classList.add('hidden');
-        }, 500); // ligera demora para suavizar transición
+        }, 800);
+
+        // Intento de inyección de CSS para ocultar capas de imágenes (si el sitio lo permite)
+        try {
+          const style = document.createElement('style');
+          style.textContent = `
+            div[class*="ads"], div[id*="ads"], .adsbygoogle, 
+            div[style*="z-index: 99999"], div[style*="z-index: 2147483647"],
+            img[src*="banner"], a[href*="doubleclick"] {
+              display: none !important;
+            }
+          `;
+          visor.contentDocument.head.appendChild(style);
+        } catch (e) {
+          console.log("🛡️ Protección de Sandbox activa (CORS bloqueó inyección manual).");
+        }
       });
     } else {
-      loader.textContent = "?? No se detectó una URL válida. Use ?star=https://...";
-      setTimeout(() => loader.classList.add('hidden'), 4000);
-      console.log("?? No se detectó una URL válida. Esperando parámetro ?star=");
+      document.getElementById('loader-text').innerHTML = "❌ Error: No hay URL válida.<br><small>Usa ?star=https://...</small>";
     }
   </script>
+
 </body>
 </html>
+
