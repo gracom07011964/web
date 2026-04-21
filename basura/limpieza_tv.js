@@ -1,9 +1,9 @@
 /**
- * Rutina de limpieza profunda de Hardware y Memoria para Android TV
- * Purga instancias de Clappr, JWPlayer, Plyr y HLS.js
+ * Rutina de limpieza ULTRA-PROFUNDA para Android TV
+ * Purga: JWPlayer, Clappr, Plyr, HLS.js, ExoPlayer (Web wrappers) y Native Android Player.
  */
 function purgarMemoriaTV() {
-    console.log("Iniciando purga de memoria y hardware...");
+    console.log("Iniciando purga total de hardware y motores de video...");
 
     // 1. Limpiar JWPlayer
     if (typeof jwplayer !== 'undefined') {
@@ -15,7 +15,7 @@ function purgarMemoriaTV() {
         } catch (e) { }
     }
 
-    // 2. Limpiar Clappr previo
+    // 2. Limpiar Clappr
     if (window.player && typeof window.player.destroy === 'function') {
         window.player.destroy();
         window.player = null;
@@ -26,27 +26,54 @@ function purgarMemoriaTV() {
         window.player.destroy();
     }
 
-    // 4. Limpiar HLS.js residual
-    if (window.hls) {
-        window.hls.destroy();
-        window.hls = null;
+    // 4. Limpiar ExoPlayer (Wrappers comunes en Web como Shaka Player o similares)
+    // Muchos reproductores basados en ExoPlayer exponen una instancia 'player' o 'shaka'
+    if (window.shaka) {
+        try {
+            window.shaka.destroy();
+            window.shaka = null;
+        } catch (e) { }
     }
 
-    // 5. Liberar el decodificador de video (Hardware)
-    var allVideos = document.querySelectorAll('video');
+    // 5. Limpiar HLS.js residual
+    if (window.hls) {
+        try {
+            window.hls.stopLoad();
+            window.hls.detachMedia();
+            window.hls.destroy();
+            window.hls = null;
+        } catch (e) { }
+    }
+
+    // 6. Limpieza del Reproductor Estándar de Android y Hardware de Video
+    // Esta es la parte más importante para liberar el decodificador físico
+    var allVideos = document.querySelectorAll('video, audio');
     allVideos.forEach(function(v) {
-        v.pause();
-        v.src = "";
-        v.removeAttribute('src');
-        v.load();
-        v.remove();
+        try {
+            v.pause();
+            // Cortamos el flujo de datos inmediatamente
+            if (v.src !== "") {
+                v.src = "";
+                v.removeAttribute('src');
+                v.load(); // Fuerza al motor nativo de Android a soltar el buffer
+            }
+            // Limpiamos los "SourceBuffers" internos (propio de ExoPlayer/HLS nativo)
+            if (v.mediaKeys) {
+                v.setMediaKeys(null);
+            }
+            v.remove(); // Elimina el elemento del DOM
+        } catch (e) { }
     });
 
-    // 6. Limpiar cachés
+    // 7. Limpieza de memoria volátil
     if (window.sessionStorage) { window.sessionStorage.clear(); }
     
-    console.log("Limpieza completada.");
+    // 8. Forzar recolector de basura (si el navegador lo permite)
+    if (window.gc) { window.gc(); }
+
+    console.log("Purga de hardware finalizada.");
 }
 
-// Ejecutamos la limpieza automáticamente al cargar el script
+// Ejecución inmediata al ser llamado en el HEAD
 purgarMemoriaTV();
+
