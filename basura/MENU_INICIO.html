@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Remoto</title>
+  <style>
+    /* (Aquí mantiene todo tu CSS igual) */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin: 0;
+      padding: 0px;
+      background-color: black;
+      background-image: url('https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001100-367f7367f9/05_-5.webp?ph=dd3bcc36cb');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 0px;
+    }
+
+    .option-item {
+      display: flex;
+      flex-direction: column; /* Imagen arriba, texto abajo */
+      align-items: center;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s, background-color 0.2s;
+      border-radius: 20px;
+      padding: 10px;
+    }
+
+    .option-item img {
+      border-radius: 10px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .option-item:focus-within,
+    .option-item:hover {
+      background-color: rgba(255, 165, 0, 0.4);
+      transform: scale(1.05);
+      box-shadow: 0 4px 0px rgba(255, 165, 0, 0.9);
+    }
+
+    .option-item img:hover,
+    .option-item img:focus {
+      transform: scale(1.1);
+      box-shadow: 0 20px 30px rgba(255, 255, 0, 0.3);
+    }
+
+    .option-item p {
+      margin-top: 7px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      transition: color 0.3s;
+    }
+
+    .option-item p:hover {
+      color: red;
+    }
+
+    .option-item p.highlight {
+      background-color: #74ACDF;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+
+    .option-item a {
+      text-decoration: none;
+      outline: none;
+    }
+
+    .option-item a:focus {
+      outline: 2px solid orange;
+      border-radius: 10px;
+    }
+
+    .menu-button {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      width: 45px;
+      height: 40px;
+      cursor: pointer;
+    }
+
+    .menu-container {
+      position: absolute;
+      top: 50px;
+      left: 10px;
+      background: rgba(50, 50, 50, 0.8);
+      border-radius: 10px;
+      width: 180px;
+      display: none;
+      flex-direction: column;
+    }
+
+    .menu-option {
+      padding: 13px;
+      color: white;
+      text-align: center;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 7px;
+      border-bottom: 1px solid grey;
+      text-decoration: none;
+      display: block;
+    }
+
+    .menu-option:last-child {
+      border-bottom: none;
+    }
+
+    .menu-option:hover {
+      background: orange;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="options">
+    <div class="option-item">
+      <a href="go:ARGE123" tabindex="0">
+        <!-- GIF animado para NOTICIAS -->
+        <img src="https://gracom07011964.github.io/web/basura/01_.gif" width="120" height="75" alt="NOTICIAS">
+      </a>
+      <p class="highlight">NOTICIAS</p>
+    </div>
+
+    <div class="option-item">
+      <a href="go:INFA123" tabindex="0">
+        <!-- GIF animado para INFANTILES -->
+        <img src="https://gracom07011964.github.io/web/basura/02_.gif" width="120" height="75" alt="INFANTILES">
+      </a>
+      <p class="highlight">INFANTILES</p>
+    </div>
+
+    <div class="option-item">
+      <a href="go:PREM123" tabindex="0">
+        <!-- GIF animado para PREMIUM -->
+        <img src="https://gracom07011964.github.io/web/basura/03_.gif" width="120" height="75" alt="PREMIUM">
+      </a>
+      <p class="highlight">PREMIUM</p>
+    </div>
+
+    <div class="option-item">
+      <a href="go:DEPO123" tabindex="0">
+        <!-- GIF animado para DEPORTES -->
+        <img src="https://gracom07011964.github.io/web/basura/04_.gif" width="120" height="75" alt="DEPORTES">
+      </a>
+      <p class="highlight">DEPORTES</p>
+    </div>
+
+    <div class="option-item">
+      <a href="go:PLU123" tabindex="0">
+        <!-- GIF animado para PLUTO TV -->
+        <img src="https://gracom07011964.github.io/web/basura/05_.gif" width="120" height="75" alt="PLUTO TV">
+      </a>
+      <p class="highlight">PLUTO TV</p>
+    </div>
+  </div>
+
+  <img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000954-1c3451c346/450/menu_2.png"
+       class="menu-button"
+       onclick="toggleMenu()"
+       alt="Menú">
+
+  <div class="menu-container" id="menu">
+    <a href="go:TEST123" class="menu-option">Test Internet</a>
+    <a href="##" class="menu-option">Películas</a>
+    <a href="go:ACTU-01" class="menu-option">Actualizar</a>
+    <a href="go:LEGAL-01" class="menu-option">Condiciones</a>
+  </div>
+
+  <script>
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+    }
+  </script>
+
+  <div id="datetime" style="
+      position: fixed;
+      top: 20px;
+      right: 15px;
+      color: white;
+      font-size: 18px;
+      font-family: 'Arial', sans-serif;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 6px 14px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+      z-index: 1000;
+      text-align: right;">
+  </div>
+
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      const day = now.getDate();
+      const month = now.toLocaleString('es-ES', { month: 'long' });
+      const year = now.getFullYear();
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      const formattedDate = `${day} de ${month} de ${year} / ${hours}:${minutes}`;
+      document.getElementById('datetime').textContent = formattedDate;
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+  </script>
+
+</body>
+</html>
+
