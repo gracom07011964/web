@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Remoto</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Barra Azul Superior */
+        .top-bar {
+            background-color: #0044cc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        .top-bar .title-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .top-bar .date-time {
+            font-size: 18px;
+            color: #e0e0e0;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0px;
+            margin: 0px;
+        }
+
+        .option-item {
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+            border-radius: 20px;
+            padding: 10px;
+        }
+
+        .option-item img {
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .option-item:focus-within,
+        .option-item:hover {
+            background-color: rgba(255, 165, 0, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 4px 0px rgba(255, 165, 0, 0.5);
+        }
+
+        .option-item img:hover,
+        .option-item img:focus {
+            transform: scale(1.1);
+            box-shadow: 0 20px 30px rgba(255, 255, 100, 0.3);
+        }
+
+        .option-item p {
+            margin-top: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            transition: color 0.3s;
+        }
+
+        .option-item p:hover {
+            color: orange;
+        }
+
+        .option-item a {
+            text-decoration: none;
+            outline: none;
+        }
+
+        .option-item a:focus {
+            outline: 2px solid orange;
+            border-radius: 10px;
+        }
+    </style>
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+            const dayName = days[now.getDay()];
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const timeString = `${dayName} ${day}/${month}/${year} - ${hours}:${minutes}`;
+            const clockElement = document.getElementById('live-clock');
+            if(clockElement) clockElement.textContent = timeString;
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            updateClock();
+            setInterval(updateClock, 1000);
+
+            window.history.pushState(null, null, document.URL);
+            window.addEventListener("popstate", function () {
+                window.location.href = "go:INI123"; 
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="title-text">Noticias y entretenimiento</div>
+        <div class="date-time" id="live-clock">Cargando...</div>
+    </div>
+
+    <div class="options">
+        <div class="option-item"><a href="go:TVR-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000703-85b8085b82/450/TVR_200X350.jpeg" width="120" height="75"><p>TVR</p></a></div>
+        <div class="option-item"><a href="go:ENLA-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000674-81b5281b54/450/Enlace_200x350.jpeg" width="120" height="75"><p>Enlace</p></a></div>
+        <div class="option-item"><a href="go:LUZ123" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000657-a1ac2a1ac4/450/CANAL%20LUZ_200x350.jpeg" width="120" height="75"><p>Canal Luz</p></a></div>
+        <div class="option-item"><a href="go:EXTRE123" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001059-2281522817/450/extremaTV_200x350-2.jpeg" width="120" height="75"><p>EXTREMA TV</p></a></div>
+        <div class="option-item"><a href="go:TN-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000702-8047c8047e/450/TN_200X350-3.jpeg" width="120" height="75"><p>TN</p></a></div>
+        <div class="option-item"><a href="go:CAN13-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000655-8168a8168c/450/CANAL%2013_200X350-8.jpeg" width="120" height="75"><p>CANAL 13</p></a></div>
+        <div class="option-item"><a href="go:TELEFE-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000654-7593375936/450/canal%2011_200x350-7.jpeg" width="120" height="75"><p>TELEFE</p></a></div>
+        <div class="option-item"><a href="go:CANAL09-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000653-608f3608f4/450/CANAL%209_200x350.jpeg" width="120" height="75"><p>CANAL 9</p></a></div>
+        <div class="option-item"><a href="go:AMERICA-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000644-cd679cd67b/450/AMERICA_200X350.jpeg" width="120" height="75"><p>AMERICA</p></a></div>
+        <div class="option-item"><a href="go:A24-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000647-de5d2de5d6/450/A24_200x350.jpeg" width="120" height="75"><p>A24</p></a></div>
+        <div class="option-item"><a href="go:LN-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000677-f005ff0061/450/LN_200X350-6.jpeg" width="120" height="75"><p>LA NACION</p></a></div>
+        <div class="option-item"><a href="go:PUBLI-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000646-d34c3d34c6/450/tv%20publico_200x350.jpeg" width="120" height="75"><p>TV PUBLICA</p></a></div>
+        <div class="option-item"><a href="go:DTV-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000665-0898108984/450/DTV_200x350.jpeg" width="120" height="75"><p>DIPUTADOS</p></a></div>
+        <div class="option-item"><a href="go:CRONI-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000664-0728c0728e/450/CRONICA%20TV_200x350.jpeg" width="120" height="75"><p>CRONICA</p></a></div>
+        <div class="option-item"><a href="go:CAN26-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000656-879e2879e4/450/CANAL%2026_200X350.jpeg" width="120" height="75"><p>CANAL 26</p></a></div>
+        <div class="option-item"><a href="go:C5N-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000642-c7472c7475/450/C5N_200x350.jpeg" width="120" height="75"><p>C5N</p></a></div>
+        <div class="option-item"><a href="go:AR12-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001243-c7c4bc7c4c/450/AR12_200x350.jpeg" width="120" height="75"><p>Argentina 12</p></a></div>
+        <div class="option-item"><a href="go:CIUDAD-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000663-dd629dd62a/450/CIUDAD_200X350.jpeg" width="120" height="75"><p>CIUDAD</p></a></div>
+        <div class="option-item"><a href="go:NET-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000693-b94d0b94d1/450/NET%20TV_200X350.jpeg" width="120" height="75"><p>NET TV</p></a></div>
+        <div class="option-item"><a href="go:ENC-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000673-7875278754/450/encuentro_200x350.jpeg" width="120" height="75"><p>ENCUENTRO</p></a></div>
+        <div class="option-item"><a href="go:ARGEN-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000645-d2c63d2c65/450/ARGENTINISIMA_200x350.jpeg" width="120" height="75"><p>Argentinísima</p></a></div>
+        <div class="option-item"><a href="go:MITRE-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000684-2fc1d2fc1e/450/Mitre%20HD_200x350.jpeg" width="120" height="75"><p>MITRE HD</p></a></div>
+        <div class="option-item"><a href="go:RIVA-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000694-e6eafe6eb2/450/rivadavia_630_200x350.jpeg" width="120" height="75"><p>RIVADAVIA</p></a></div>
+        <div class="option-item"><a href="go:URBA-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001132-2551e25520/450/Urbana%20Play_200x350.jpeg" width="120" height="75"><p>UrbanaPlay</p></a></div>
+        <div class="option-item"><a href="go:TELE-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000699-b51acb51ad/450/telered_canal%20Provincial_200x350.jpeg" width="120" height="75"><p>TELERED</p></a></div>
+        <div class="option-item"><a href="go:MU-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000687-8588e8588f/450/MULTIVISION_200X350.jpeg" width="120" height="75"><p>MULTIVISION</p></a></div>
+        <div class="option-item"><a href="go:MAGA-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000683-09d8009d83/450/MAGAZINE_200X350.jpeg" width="120" height="75"><p>MAGAZINE</p></a></div>
+        <div class="option-item"><a href="go:CARANO-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001125-40ee840eeb/450/Caracol%20NOTICIAS_200x350.jpeg" width="120" height="75"><p>NOTICIAS</p></a></div>
+        <div class="option-item"><a href="go:CARATV-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001124-3ad0e3ad0f/450/Caracol%20TELEVISION_200x350.jpeg" width="120" height="75"><p>TELEVISIÓN</p></a></div>
+        <div class="option-item"><a href="go:DW-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000666-406ed406f0/450/DW_tv_200x350.jpeg" width="120" height="75"><p>DW</p></a></div>
+        <div class="option-item"><a href="go:TMAX-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000695-f2ae3f2ae6/450/TELEMAX_200x350.jpeg" width="120" height="75"><p>TELEMAX</p></a></div>
+        <div class="option-item"><a href="go:VOR-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200000706-1189a1189b/450/VORTERIX_200x350.jpeg" width="120" height="75"><p>VORTERIX</p></a></div>
+        <div class="option-item"><a href="go:CM-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001237-b48a0b48a2/450/canal%20de%20la%20musica_200x350.jpeg" width="120" height="75"><p>Canal Música</p></a></div>
+        <div class="option-item"><a href="go:FLOW-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001235-ad92dad92f/450/FlowMusicXP_200x350-4.jpeg" width="120" height="75"><p>Flow Música</p></a></div>
+        <div class="option-item"><a href="go:QUIE-01" tabindex="0"><img src="https://dd3bcc36cb.clvaw-cdnwnd.com/052f423c26aa8c8986385162cc370f99/200001134-d04b6d04b9/450/QUIERO%20MUSICA%20TV_200X350.jpeg" width="120" height="75"><p>Quiero Música</p></a></div>
+    </div>
+</body>
+</html>
+
