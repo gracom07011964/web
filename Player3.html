@@ -1,0 +1,735 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>AndenTV Player</title>
+
+<!-- =====================================================
+     JWPLAYER
+     ===================================================== -->
+
+<script src="https://cdn.jwplayer.com/libraries/IDzF9Zmk.js"></script>
+
+
+<!-- =====================================================
+     ESTILOS
+     ===================================================== -->
+
+<style>
+
+html,
+body {
+
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #000;
+
+    overflow: hidden;
+
+}
+
+#player {
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #000;
+
+}
+
+/* Pantalla de carga */
+
+#loading {
+
+    position: absolute;
+
+    z-index: 9999;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    color: #fff;
+
+    font-family: Arial, sans-serif;
+
+}
+
+#loadingText {
+
+    margin-top: 15px;
+
+    font-size: 18px;
+
+}
+
+
+/* Indicador de carga */
+
+.loader {
+
+    width: 45px;
+    height: 45px;
+
+    border: 4px solid #333;
+
+    border-top: 4px solid #fff;
+
+    border-radius: 50%;
+
+    animation: girar 1s linear infinite;
+
+}
+
+@keyframes girar {
+
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* Mensaje de error */
+
+#error {
+
+    position: absolute;
+
+    z-index: 9998;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #000;
+
+    display: none;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-direction: column;
+
+    color: #fff;
+
+    font-family: Arial, sans-serif;
+
+    text-align: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+}
+
+#error h2 {
+
+    margin-bottom: 10px;
+
+}
+
+#error p {
+
+    color: #ccc;
+
+    max-width: 700px;
+
+    word-break: break-word;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     REPRODUCTOR
+     ===================================================== -->
+
+<div id="player"></div>
+
+
+<!-- =====================================================
+     PANTALLA DE CARGA
+     ===================================================== -->
+
+<div id="loading">
+
+    <div class="loader"></div>
+
+    <div id="loadingText">
+        Cargando canal...
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     MENSAJE DE ERROR
+     ===================================================== -->
+
+<div id="error">
+
+    <h2>Error al reproducir</h2>
+
+    <p id="errorText"></p>
+
+</div>
+
+
+<script>
+
+
+/* =====================================================
+   CONFIGURACIÓN
+   ===================================================== */
+
+
+/*
+ * LISTA M3U
+ */
+
+const M3U_URL =
+"https://raw.githubusercontent.com/andentv/packcanales/main/andentv93.m3u";
+
+
+/* =====================================================
+   OBTENER EL CANAL DESDE LA URL DEL NAVEGADOR
+   ===================================================== */
+
+
+/*
+ * Ejemplo:
+ *
+ * player.html?channel=Telefe.ar
+ *
+ * Obtendremos:
+ *
+ * Telefe.ar
+ */
+
+const parametros =
+new URLSearchParams(window.location.search);
+
+
+const TVG_ID =
+parametros.get("channel");
+
+
+/* =====================================================
+   FUNCIONES DE INTERFAZ
+   ===================================================== */
+
+
+function ocultarCarga() {
+
+    const loading =
+    document.getElementById("loading");
+
+    loading.style.display = "none";
+
+}
+
+
+function mostrarError(mensaje) {
+
+    const loading =
+    document.getElementById("loading");
+
+    const error =
+    document.getElementById("error");
+
+    const errorText =
+    document.getElementById("errorText");
+
+
+    loading.style.display = "none";
+
+    error.style.display = "flex";
+
+    errorText.textContent = mensaje;
+
+}
+
+
+/* =====================================================
+   BUSCAR CANAL EN EL M3U
+   ===================================================== */
+
+
+async function obtenerCanal(tvgId) {
+
+    try {
+
+        console.log(
+            "Descargando lista M3U..."
+        );
+
+
+        /*
+         * Descargar M3U
+         */
+
+        const respuesta =
+        await fetch(M3U_URL);
+
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                "No se pudo descargar la lista M3U. " +
+                "Código HTTP: " +
+                respuesta.status
+            );
+
+        }
+
+
+        const contenido =
+        await respuesta.text();
+
+
+        console.log(
+            "Lista M3U descargada correctamente."
+        );
+
+
+        /*
+         * Separar por líneas
+         */
+
+        const lineas =
+        contenido.split(/\r?\n/);
+
+
+        /*
+         * Recorrer todas las líneas
+         */
+
+        for (
+            let i = 0;
+            i < lineas.length;
+            i++
+        ) {
+
+
+            const linea =
+            lineas[i].trim();
+
+
+            /*
+             * Comprobar si contiene
+             * el tvg-id solicitado
+             */
+
+            if (
+                linea.includes(
+                    'tvg-id="' +
+                    tvgId +
+                    '"'
+                )
+            ) {
+
+
+                console.log(
+                    "Canal encontrado:",
+                    tvgId
+                );
+
+
+                /*
+                 * Buscar la URL
+                 *
+                 * Normalmente está
+                 * inmediatamente después
+                 * de #EXTINF
+                 */
+
+                for (
+                    let j = i + 1;
+                    j < lineas.length;
+                    j++
+                ) {
+
+
+                    const siguiente =
+                    lineas[j].trim();
+
+
+                    /*
+                     * Ignorar líneas vacías
+                     */
+
+                    if (
+                        siguiente === ""
+                    ) {
+
+                        continue;
+
+                    }
+
+
+                    /*
+                     * Ignorar otras etiquetas
+                     */
+
+                    if (
+                        siguiente.startsWith("#")
+                    ) {
+
+                        continue;
+
+                    }
+
+
+                    /*
+                     * Encontramos la URL
+                     */
+
+                    console.log(
+                        "URL encontrada:",
+                        siguiente
+                    );
+
+
+                    return siguiente;
+
+                }
+
+            }
+
+        }
+
+
+        /*
+         * Si llegamos aquí,
+         * el canal no existe
+         */
+
+        throw new Error(
+            'No se encontró el canal "' +
+            tvgId +
+            '" en la lista M3U.'
+        );
+
+
+    } catch (error) {
+
+        throw error;
+
+    }
+
+}
+
+
+/* =====================================================
+   INICIAR JWPLAYER
+   ===================================================== */
+
+
+function iniciarReproductor(url) {
+
+
+    console.log(
+        "Inicializando JWPlayer..."
+    );
+
+
+    /*
+     * Crear instancia
+     */
+
+    const playerInstance =
+    jwplayer("player");
+
+
+    /*
+     * Configuración del reproductor
+     */
+
+    playerInstance.setup({
+
+        playlist: [{
+
+            sources: [{
+
+                /*
+                 * URL obtenida automáticamente
+                 * desde el M3U
+                 */
+
+                file: url,
+
+
+                /*
+                 * DRM ClearKey
+                 *
+                 * Se mantiene preparado
+                 * para streams que lo necesiten.
+                 */
+
+                drm: {
+
+                    clearkey: {
+
+                        keyId: "",
+
+                        key: ""
+
+                    }
+
+                }
+
+            }]
+
+        }],
+
+
+        /*
+         * Pantalla completa
+         */
+
+        width: "100%",
+
+        height: "100%",
+
+
+        /*
+         * Reproducción automática
+         */
+
+        autostart: true,
+
+
+        /*
+         * Audio activado
+         */
+
+        mute: false,
+
+
+        /*
+         * Chromecast
+         */
+
+        cast: {},
+
+
+        /*
+         * Compartir
+
+         */
+
+        sharing: {}
+
+    });
+
+
+    /*
+     * Eventos del reproductor
+     */
+
+    playerInstance.on(
+        "ready",
+        function() {
+
+            console.log(
+                "JWPlayer listo."
+            );
+
+            ocultarCarga();
+
+        }
+    );
+
+
+    playerInstance.on(
+        "play",
+        function() {
+
+            ocultarCarga();
+
+        }
+    );
+
+
+    playerInstance.on(
+        "error",
+        function(event) {
+
+            console.error(
+                "Error JWPlayer:",
+                event
+            );
+
+
+            mostrarError(
+                "El reproductor no pudo reproducir " +
+                "este canal."
+            );
+
+        }
+    );
+
+
+    playerInstance.on(
+        "setupError",
+        function(event) {
+
+            console.error(
+                "Error de configuración:",
+                event
+            );
+
+
+            mostrarError(
+                "No se pudo configurar el reproductor."
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   PROCESO PRINCIPAL
+   ===================================================== */
+
+
+async function iniciar() {
+
+
+    /*
+     * Comprobar que se recibió
+     * el parámetro channel
+     */
+
+    if (
+        !TVG_ID ||
+        TVG_ID.trim() === ""
+    ) {
+
+
+        mostrarError(
+            "No se indicó ningún canal. " +
+            "Utilice, por ejemplo: " +
+            "player.html?channel=Telefe.ar"
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+     * Mostrar en consola
+     */
+
+    console.log(
+        "Canal solicitado:",
+        TVG_ID
+    );
+
+
+    try {
+
+
+        /*
+         * Buscar canal
+         */
+
+        const url =
+        await obtenerCanal(
+            TVG_ID.trim()
+        );
+
+
+        /*
+         * Mostrar URL encontrada
+         */
+
+        console.log(
+            "Reproduciendo:",
+            url
+        );
+
+
+        /*
+         * Iniciar reproductor
+         */
+
+        iniciarReproductor(url);
+
+
+    } catch (error) {
+
+
+        console.error(
+            error
+        );
+
+
+        mostrarError(
+            error.message
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   EJECUTAR
+   ===================================================== */
+
+
+iniciar();
+
+
+</script>
+
+
+</body>
+
+</html>
+```
